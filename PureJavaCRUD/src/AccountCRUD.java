@@ -108,6 +108,47 @@ public class AccountCRUD {
 
 
 
+    // ── CHANGE PASSWORD ───────────────────────────────────────────────────────
+    static void changePassword(Scanner sc, boolean isOwnPassword) {
+        System.out.println("\n== CHANGE PASSWORD ==");
+        int targetId = Auth.currentId;
+
+        if (!isOwnPassword) {
+            // Admin changing someone else's password
+            listAccounts();
+            System.out.print("\n  Enter User ID: ");
+            targetId = DeviceCRUD.parseInt(sc.nextLine().trim());
+            if (targetId < 0) { System.out.println("  Invalid ID."); return; }
+        } else {
+            // User changing own — verify current password first
+            System.out.print("  Current Password : ");
+            String cur = sc.nextLine().trim();
+            if (!Auth.login(Auth.currentUsername, cur)) {
+                System.out.println("  Incorrect current password."); return;
+            }
+        }
+
+        System.out.print("  New Password     : "); String newPass = sc.nextLine().trim();
+        if (newPass.length() < 6) { System.out.println("  Min 6 characters."); return; }
+        System.out.print("  Confirm Password : "); String confirm = sc.nextLine().trim();
+        if (!newPass.equals(confirm)) { System.out.println("  Passwords do not match."); return; }
+
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+        try {
+            PreparedStatement ps = Database.connect().prepareStatement(sql);
+            ps.setString(1, Auth.hash(newPass));
+            ps.setInt(2, targetId);
+            ps.executeUpdate();
+            AuditLog.write("CHANGE_PASSWORD", "Changed password for user ID: " + targetId);
+            System.out.println("  Password changed successfully!");
+        } catch (SQLException e) {
+            System.out.println("  Error: " + e.getMessage());
+        }
+    }
+}
+
+
+
 
 
 
