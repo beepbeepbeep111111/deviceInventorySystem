@@ -282,11 +282,32 @@ public class DeviceCRUD {
         } catch (SQLException e) {
             System.out.println("  Error: " + e.getMessage());
         }
+
+        // â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    static String parseStatus(String input, String fallback) {
+        return switch (input) {
+            case "1" -> "Active";
+            case "2" -> "Inactive";
+            case "3" -> "Under Repair";
+            case "4" -> "Retired";
+            default  -> fallback;
+        };
     }
 
-    
+    static String trunc(String s, int max) {
+        if (s == null) return "";
+        return s.length() > max ? s.substring(0, max - 3) + "..." : s;
+    }
 
+    static String defVal(String input, String fallback) {
+        return input.isEmpty() ? fallback : input;
+    }
 
+    static String str(String s) {
+        return s == null ? "" : s;
+    }
 
-
-    
+    static int parseInt(String s) {
+        try { return Integer.parseInt(s); }
+        catch (NumberFormatException e) { return -1; }
+    }
